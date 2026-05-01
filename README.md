@@ -96,4 +96,4 @@ Contribuições são bem-vindas! Para contribuir:
 Este projeto está licenciado sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
 ---
-Desenvolvido por Fábio Rómulo e Taha-Wur Pereira.
+Desenvolvido por Fábio Rómulo, Feliciano Barta e Taha-Wur Pereira.

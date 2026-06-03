@@ -1,4 +1,4 @@
-import { escapeHtml } from "./auth.shared";
+import { escapeHtml } from "../utils/auth.shared";
 
 export const inicioHtml = (userName: string, turma: string): string => {
     const dateLabel = "Segunda-feira, 27 de abril de 2026";

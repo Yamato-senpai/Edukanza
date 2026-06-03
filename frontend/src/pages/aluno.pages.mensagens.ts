@@ -1,5 +1,5 @@
-import { escapeHtml } from "./auth.shared";
-import { icon } from "./aluno.icons";
+import { escapeHtml } from "../utils/auth.shared";
+import { icon } from "../utils/aluno.icons";
 
 export const mensagensHtml = (): string => `
   <div class="edk-msg-top">
@@ -46,4 +46,3 @@ const msgItem = (sender: string, title: string, snippet: string, when: string): 
     </div>
   </section>
 `;
-

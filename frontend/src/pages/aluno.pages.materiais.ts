@@ -1,5 +1,5 @@
-import { escapeHtml } from "./auth.shared";
-import { icon } from "./aluno.icons";
+import { escapeHtml } from "../utils/auth.shared";
+import { icon } from "../utils/aluno.icons";
 
 export const materiaisHtml = (): string => `
   <h1 class="edk-page-title">Materiais de Estudo</h1>

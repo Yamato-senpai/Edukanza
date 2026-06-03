@@ -1,6 +1,6 @@
-import { escapeHtml } from "./auth.shared";
-import { ensureAppStyles } from "./app.styles";
-import { icon } from "./aluno.icons";
+import { escapeHtml } from "../utils/auth.shared";
+import { ensureAppStyles } from "../utils/app.styles";
+import { icon } from "../utils/aluno.icons";
 import { avaliacoesHtml } from "./aluno.pages.avaliacoes";
 import { inicioHtml } from "./aluno.pages.inicio";
 import { materiaisHtml } from "./aluno.pages.materiais";

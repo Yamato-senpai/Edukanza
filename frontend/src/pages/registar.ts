@@ -7,24 +7,24 @@ import {
   ProfileId,
   setError,
   setSelectedProfile,
-} from "./auth.shared";
+} from "../utils/auth.shared";
 
-type LoginPayload = {
+type RegisterPayload = {
   profile: ProfileId;
+  fullName: string;
   email: string;
   password: string;
 };
 
-type LoginPageOptions = {
+type RegisterPageOptions = {
   brandName?: string;
-  onSubmit?: (payload: LoginPayload) => void;
-  onNavigate?: (to: "register") => void;
-  onForgotPassword?: (email: string) => void;
+  onSubmit?: (payload: RegisterPayload) => void;
+  onNavigate?: (to: "login") => void;
 };
 
-const buildLoginHtml = (selected: ProfileId | null): string => `
-  <h1 class="edk-title">Entrar</h1>
-  <p class="edk-subtitle">Escolha o seu perfil e inicie sessão.</p>
+const buildRegisterHtml = (selected: ProfileId | null): string => `
+  <h1 class="edk-title">Criar Conta</h1>
+  <p class="edk-subtitle">Escolha o seu perfil e preencha os dados para registar.</p>
 
   <section class="edk-profiles" aria-label="Perfis">
     ${buildProfileCardsHtml(selected)}
@@ -34,40 +34,50 @@ const buildLoginHtml = (selected: ProfileId | null): string => `
 
   <form class="edk-form" data-edk-form="1" novalidate>
     <div class="edk-field">
+      <label for="edk-fullName">Nome completo</label>
+      <input id="edk-fullName" name="fullName" autocomplete="name" inputmode="text" required />
+    </div>
+
+    <div class="edk-field">
       <label for="edk-email">Email</label>
       <input id="edk-email" name="email" type="email" autocomplete="email" inputmode="email" required />
     </div>
-    <div class="edk-field">
-      <label for="edk-password">Palavra-passe</label>
-      <input id="edk-password" name="password" type="password" autocomplete="current-password" required />
+
+    <div class="edk-row">
+      <div class="edk-field">
+        <label for="edk-password">Palavra-passe</label>
+        <input id="edk-password" name="password" type="password" autocomplete="new-password" required />
+      </div>
+      <div class="edk-field">
+        <label for="edk-password2">Confirmar palavra-passe</label>
+        <input id="edk-password2" name="password2" type="password" autocomplete="new-password" required />
+      </div>
     </div>
 
     <div class="edk-actions">
-      <button class="edk-btn" type="submit">Entrar</button>
-      <button class="edk-link" type="button" data-edk-nav="register">Criar conta</button>
-      <button class="edk-link-muted" type="button" data-edk-forgot="1">Esqueci a palavra-passe</button>
+      <button class="edk-btn" type="submit">Registar</button>
+      <button class="edk-link" type="button" data-edk-nav="login">Já tenho conta</button>
     </div>
   </form>
 `;
 
-export const mountLoginPage = (
+export const mountRegisterPage = (
   container: HTMLElement,
-  options: LoginPageOptions = {},
+  options: RegisterPageOptions = {},
 ): { unmount: () => void } => {
   ensureAuthStyles();
 
-  const opts: Required<LoginPageOptions> = {
+  const opts: Required<RegisterPageOptions> = {
     brandName: options.brandName ?? "Edukanza",
     onSubmit: options.onSubmit ?? (() => { }),
     onNavigate: options.onNavigate ?? (() => { }),
-    onForgotPassword: options.onForgotPassword ?? (() => { }),
   };
 
   const previous = container.innerHTML;
   let selected: ProfileId | null = null;
 
   const render = (): void => {
-    container.innerHTML = buildShellHtml(opts.brandName, buildLoginHtml(selected));
+    container.innerHTML = buildShellHtml(opts.brandName, buildRegisterHtml(selected));
     bindProfilePicker(container, (p) => {
       selected = p;
       setSelectedProfile(container, selected);
@@ -90,42 +100,41 @@ export const mountLoginPage = (
 
     if (!form) return;
     const fd = new FormData(form);
+    const fullName = String(fd.get("fullName") ?? "").trim();
     const email = String(fd.get("email") ?? "").trim();
     const password = String(fd.get("password") ?? "");
+    const password2 = String(fd.get("password2") ?? "");
 
-    if (!email || !password) {
-      setError(container, "Preencha o email e a palavra-passe.");
+    if (!fullName || !email || !password || !password2) {
+      setError(container, "Preencha todos os campos.");
       return;
     }
 
-    opts.onSubmit({ profile, email, password });
+    if (password !== password2) {
+      setError(container, "As palavras-passe não coincidem.");
+      return;
+    }
+
+    opts.onSubmit({ profile, fullName, email, password });
   };
 
   form?.addEventListener("submit", onSubmit);
 
-  const nav = container.querySelector<HTMLButtonElement>('[data-edk-nav="register"]');
-  const onNav = () => opts.onNavigate("register");
+  const nav = container.querySelector<HTMLButtonElement>('[data-edk-nav="login"]');
+  const onNav = () => opts.onNavigate("login");
   nav?.addEventListener("click", onNav);
-
-  const forgot = container.querySelector<HTMLButtonElement>('[data-edk-forgot="1"]');
-  const onForgot = () => {
-    const input = container.querySelector<HTMLInputElement>("#edk-email");
-    opts.onForgotPassword(String(input?.value ?? "").trim());
-  };
-  forgot?.addEventListener("click", onForgot);
 
   return {
     unmount: () => {
       form?.removeEventListener("submit", onSubmit);
       nav?.removeEventListener("click", onNav);
-      forgot?.removeEventListener("click", onForgot);
       container.innerHTML = previous;
     },
   };
 };
 
 if (typeof window !== "undefined" && typeof document !== "undefined") {
-  const boot = () => mountLoginPage(document.body);
+  const boot = () => mountRegisterPage(document.body);
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot, { once: true });
   } else {

@@ -1,4 +1,4 @@
-import { escapeHtml } from "./auth.shared";
+import { escapeHtml } from "../utils/auth.shared";
 
 export const avaliacoesHtml = (): string => `
   <div class="edk-row" style="margin-bottom:10px">
